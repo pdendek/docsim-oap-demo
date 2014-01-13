@@ -6,6 +6,11 @@
 
 package pl.edu.icm.coansys.webdemo.controller;
 
+import com.google.gson.Gson;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +19,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import pl.edu.icm.coansys.webdemo.data.json.Citation;
+import pl.edu.icm.coansys.webdemo.data.json.ExtractedMetadata;
+import pl.edu.icm.coansys.webdemo.data.json.MatchedDocument;
+import pl.edu.icm.coansys.webdemo.data.json.MatchingRequest;
+import pl.edu.icm.coansys.webdemo.data.json.MatchingResult;
+import pl.edu.icm.coansys.webdemo.data.json.ResultEntry;
 
 /**
  *
@@ -25,52 +38,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CoansysController {
     Logger logger = LoggerFactory.getLogger(CoansysController.class);
     
-    @RequestMapping(value = "/citations.do")
-    public ResponseEntity<String> extractSync(@RequestParam("q") String query,
+    @RequestMapping(value = "/citations.do", method = RequestMethod.POST)
+    public ResponseEntity<String> extractSync(@RequestBody String query,
             Model model) {
         try {
             logger.debug("the query: " + query);
+            MatchingRequest req = MatchingRequest.fromJson(query);
+            
+            List<ResultEntry> results = new ArrayList<ResultEntry>();
+            
+            for (Citation cit : req.getCitations()) {
+                logger.info(cit.getCitationText());
+                results.add(new ResultEntry(cit.getCitationText(), new ExtractedMetadata(), Collections.<MatchedDocument>emptyList()));
+            }
+            
+            String response = new Gson().toJson(new MatchingResult(results));
             
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-            String response = "{\n" +
-"  \"results\":[\n" +
-"    {\n" +
-"      \"extracted-metadata\":{\n" +
-"        \"author\":\"Copernicus, N.\",\n" +
-"        \"year\":\"1543\",\n" +
-"        \"title\":\"De revolutionibus orbium coelestium\"\n" +
-"      },\n" +
-"      \"matched-documents\":[\n" +
-"        {\n" +
-"          \"metadata\":{\n" +
-"            \"id\":\"doc1\",\n" +
-"            \"author\":\"Nicolaus Copernicus\",\n" +
-"            \"year\":\"1543\",\n" +
-"            \"title\":\"De revolutionibus orbium coelestium\"\n" +
-"          },\n" +
-"          \"score\":0.95\n" +
-"        },\n" +
-"        {\n" +
-"          \"metadata\":{\n" +
-"            \"id\":\"doc123\"\n" +
-"          },\n" +
-"          \"score\":0.6\n" +
-"        }\n" +
-"      ]\n" +
-"    },\n" +
-"    {\n" +
-"      \"extracted-metadata\":{\n" +
-"        \"author\":\"Newton, I.\",\n" +
-"        \"year\":\"1687\",\n" +
-"        \"title\":\"Philosophiae naturalis principia mathematica\"\n" +
-"      },\n" +
-"      \"matched-documents\":[\n" +
-"\n" +
-"      ]\n" +
-"    }\n" +
-"  ]\n" +
-"}";
+
             return new ResponseEntity<String>(response, responseHeaders, HttpStatus.OK);
         } catch (Exception ex) {
             java.util.logging.Logger.getLogger(CoansysController.class.getName()).log(Level.SEVERE, null, ex);
