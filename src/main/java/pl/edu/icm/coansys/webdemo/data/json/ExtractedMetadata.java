@@ -5,6 +5,8 @@
  */
 package pl.edu.icm.coansys.webdemo.data.json;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  *
  * @author matfed
@@ -20,11 +22,16 @@ public class ExtractedMetadata {
     public ExtractedMetadata() {}
     
     public ExtractedMetadata(String author, String year, String title, String journal, String pages) {
-        this.author = author;
-        this.year = year;
-        this.title = title;
-        this.journal = journal;
-        this.pages = pages;
+        if (StringUtils.isNotBlank(author))
+            this.author = author;
+        if (StringUtils.isNotBlank(year))
+            this.year = year;
+        if (StringUtils.isNotBlank(title))
+            this.title = title;
+        if (StringUtils.isNotBlank(journal))
+            this.journal = journal;
+        if (StringUtils.isNotBlank(pages))
+            this.pages = pages;
     }
 
     public String getAuthor() {
