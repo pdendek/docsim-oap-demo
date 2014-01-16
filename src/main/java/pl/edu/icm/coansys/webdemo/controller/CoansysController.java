@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import pl.edu.icm.coansys.citations.data.MatchableEntity;
 import pl.edu.icm.coansys.webdemo.data.json.Citation;
+import pl.edu.icm.coansys.webdemo.data.json.DocumentMetadata;
 import pl.edu.icm.coansys.webdemo.data.json.ExtractedMetadata;
 import pl.edu.icm.coansys.webdemo.data.json.MatchedDocument;
 import pl.edu.icm.coansys.webdemo.data.json.MatchingRequest;
@@ -48,8 +49,8 @@ public class CoansysController {
         this.parsingService = parsingService;
     }
     
-    @RequestMapping(value = "/citations.do", method = RequestMethod.POST)
-    public ResponseEntity<String> extractSync(@RequestBody String query,
+    @RequestMapping(value = "/citation_matching.do", method = RequestMethod.POST)
+    public ResponseEntity<String> citationMatching(@RequestBody String query,
             Model model) {
         try {
             logger.debug("the query: " + query);
@@ -61,10 +62,14 @@ public class CoansysController {
                 String citationText = cit.getCitationText();
                 logger.info(citationText);
                 MatchableEntity parsed = parsingService.parseCitation(citationText);
-                results.add(
-                        new ResultEntry(citationText, 
+                List<MatchedDocument> matched = new ArrayList<MatchedDocument>();
+                matched.add(new MatchedDocument(0.95, new DocumentMetadata("doc1", "http://www.bj.uj.edu.pl/bjmanus/revol/titlpg_p.html", "Nicolaus Copernicus", "1543", "De revolutionibus orbium coelestium", null, null)));
+                matched.add(new MatchedDocument(0.6, new DocumentMetadata("doc123", null, null, null, null, null, null)));
+                
+                results.add(new ResultEntry(
+                        citationText, 
                         new ExtractedMetadata(parsed.author(), parsed.year(), parsed.title(), parsed.source(), parsed.pages()), 
-                        Collections.<MatchedDocument>emptyList()));
+                        matched));
             }
             
             String response = new Gson().toJson(new MatchingResult(results));
@@ -78,5 +83,94 @@ public class CoansysController {
             return new ResponseEntity<String>("Exception: " + ex.getMessage(), null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+    @RequestMapping(value = "/document_similarity.do", method = RequestMethod.POST)
+    public ResponseEntity<String> documentSimilarity(@RequestBody String query,
+            Model model) {
+            logger.debug("the query: " + query);
+            
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+            String response = "{\r\n" +
+"    \"outputObject\": {\r\n" +
+"        \"givenArticleDetails\": {\r\n" +
+"            \"doi\": \"10.3791/3308\",\r\n" +
+"            \"linkAddress\": \"http://www.lubie-kraby.pl/krolestwo-za-kraby,0\",\r\n" +
+"            \"year\": \"2012\",\r\n" +
+"            \"title\": \"Implantation of a Carotid Cuff for Triggering Shear-stress Induced Atherosclerosis in Mice\",\r\n" +
+"            \"authors\": [\r\n" +
+"                \"Michael T. Kuhlmann\",\r\n" +
+"                \"Simon Cuhlmann\",\r\n" +
+"                \"Irmgard Hoppe\",\r\n" +
+"                \"Rob Krams\",\r\n" +
+"                \"Paul C. Evans\",\r\n" +
+"                \"Gustav J. Strijkers\",\r\n" +
+"                \"Klaas Nicolay\",\r\n" +
+"                \"Sven Hermann\",\r\n" +
+"                \"Michael SchĂ¤fers\"\r\n" +
+"            ],\r\n" +
+"            \"abstract\": \"It is widely accepted that alterations in vascular shear stress trigger the expression of inflammatory genes in endothelial cells...\"\r\n" +
+"        },\r\n" +
+"        \"similarResults\": [\r\n" +
+"            {\r\n" +
+"                \"similarity\": \"0.9\",\r\n" +
+"                \"doi\": \"10.3791/9\",\r\n" +
+"                \"linkAddress\": \"http://www.lubie-kraby.pl/9\",\r\n" +
+"                \"year\": \"2012\",\r\n" +
+"                \"title\": \"Implantation\",\r\n" +
+"                \"authors\": [\r\n" +
+"                    \"Michael T. Kuhlmann\"\r\n" +
+"                ],\r\n" +
+"                \"abstract\": \"It is\"\r\n" +
+"            },\r\n" +
+"            {\r\n" +
+"                \"similarity\": \"0.8\",\r\n" +
+"                \"doi\": \"10.3791/8\",\r\n" +
+"                \"linkAddress\": \"http://www.lubie-kraby.pl/8\",\r\n" +
+"                \"year\": \"2012\",\r\n" +
+"                \"title\": \"of\",\r\n" +
+"                \"authors\": [\r\n" +
+"                    \"Simon Cuhlmann\"\r\n" +
+"                ],\r\n" +
+"                \"abstract\": \"widely accepted\"\r\n" +
+"            },\r\n" +
+"            {\r\n" +
+"                \"similarity\": \"0.7\",\r\n" +
+"                \"doi\": \"10.3791/7\",\r\n" +
+"                \"linkAddress\": \"http://www.lubie-kraby.pl/7\",\r\n" +
+"                \"year\": \"2012\",\r\n" +
+"                \"title\": \"a\",\r\n" +
+"                \"authors\": [\r\n" +
+"                    \"Irmgard Hoppe\"\r\n" +
+"                ],\r\n" +
+"                \"abstract\": \"that alterations\"\r\n" +
+"            },\r\n" +
+"            {\r\n" +
+"                \"similarity\": \"0.6\",\r\n" +
+"                \"doi\": \"10.3791/6\",\r\n" +
+"                \"linkAddress\": \"http://www.lubie-kraby.pl/6\",\r\n" +
+"                \"year\": \"2012\",\r\n" +
+"                \"title\": \"Carotid Cuff\",\r\n" +
+"                \"authors\": [\r\n" +
+"                    \"Rob Krams\"\r\n" +
+"                ],\r\n" +
+"                \"abstract\": \"in vascular\"\r\n" +
+"            },\r\n" +
+"            {\r\n" +
+"                \"similarity\": \"0.5\",\r\n" +
+"                \"doi\": \"10.3791/5\",\r\n" +
+"                \"linkAddress\": \"http://www.lubie-kraby.pl/5\",\r\n" +
+"                \"year\": \"2012\",\r\n" +
+"                \"title\": \"for Triggering\",\r\n" +
+"                \"authors\": [\r\n" +
+"                    \"Paul C. Evans\"\r\n" +
+"                ],\r\n" +
+"                \"abstract\": \"shear stress\"\r\n" +
+"            }\r\n" +
+"        ]\r\n" +
+"    }\r\n" +
+"}\r\n";
+            
+            return new ResponseEntity<String>(response, responseHeaders, HttpStatus.OK);
+    }
 }
