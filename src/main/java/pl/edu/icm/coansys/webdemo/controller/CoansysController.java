@@ -63,7 +63,7 @@ public class CoansysController {
                 logger.info(citationText);
                 MatchableEntity parsed = parsingService.parseCitation(citationText);
                 List<MatchedDocument> matched = new ArrayList<MatchedDocument>();
-                matched.add(new MatchedDocument(0.95, new DocumentMetadata("doc1", "http://www.bj.uj.edu.pl/bjmanus/revol/titlpg_p.html", "Nicolaus Copernicus", "1543", "De revolutionibus orbium coelestium", null, null)));
+                matched.add(new MatchedDocument(0.95, new DocumentMetadata("doc1", "10.1000/182", "Nicolaus Copernicus", "1543", "De revolutionibus orbium coelestium", null, null)));
                 matched.add(new MatchedDocument(0.6, new DocumentMetadata("doc123", null, null, null, null, null, null)));
                 
                 results.add(new ResultEntry(

@@ -12,7 +12,7 @@ package pl.edu.icm.coansys.webdemo.data.json;
  */
 public class DocumentMetadata {
     private String id;
-    private String url;
+    private String doi;
     private String author;
     private String year;
     private String title;
@@ -21,9 +21,9 @@ public class DocumentMetadata {
 
     public DocumentMetadata() {}
     
-    public DocumentMetadata(String id, String url, String author, String year, String title, String journal, String pages) {
+    public DocumentMetadata(String id, String doi, String author, String year, String title, String journal, String pages) {
         this.id = id;
-        this.url = url;
+        this.doi = doi;
         this.author = author;
         this.year = year;
         this.title = title;
@@ -39,12 +39,12 @@ public class DocumentMetadata {
         this.id = id;
     }
 
-    public String getUrl() {
-        return url;
+    public String getDoi() {
+        return doi;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setDoi(String doi) {
+        this.doi = doi;
     }
 
     public String getAuthor() {
