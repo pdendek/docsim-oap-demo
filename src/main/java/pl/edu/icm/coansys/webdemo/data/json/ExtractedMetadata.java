@@ -6,6 +6,7 @@
 package pl.edu.icm.coansys.webdemo.data.json;
 
 import org.apache.commons.lang.StringUtils;
+import pl.edu.icm.coansys.citations.data.MatchableEntity;
 
 /**
  *
@@ -22,16 +23,11 @@ public class ExtractedMetadata {
     public ExtractedMetadata() {}
     
     public ExtractedMetadata(String author, String year, String title, String journal, String pages) {
-        if (StringUtils.isNotBlank(author))
-            this.author = author;
-        if (StringUtils.isNotBlank(year))
-            this.year = year;
-        if (StringUtils.isNotBlank(title))
-            this.title = title;
-        if (StringUtils.isNotBlank(journal))
-            this.journal = journal;
-        if (StringUtils.isNotBlank(pages))
-            this.pages = pages;
+        this.author = author;
+        this.year = year;
+        this.title = title;
+        this.journal = journal;
+        this.pages = pages;
     }
 
     public String getAuthor() {
@@ -74,5 +70,18 @@ public class ExtractedMetadata {
         this.pages = pages;
     }
     
-    
+    public static ExtractedMetadata fromMatchableEntity(MatchableEntity entity) {
+        ExtractedMetadata result = new ExtractedMetadata();
+        if (StringUtils.isNotBlank(entity.author()))
+            result.author = entity.author();
+        if (StringUtils.isNotBlank(entity.year()))
+            result.year = entity.year();
+        if (StringUtils.isNotBlank(entity.title()))
+            result.title = entity.title();
+        if (StringUtils.isNotBlank(entity.source()))
+            result.journal = entity.source();
+        if (StringUtils.isNotBlank(entity.pages()))
+            result.pages = entity.pages();
+        return result;
+    }
 }

@@ -6,6 +6,9 @@
 
 package pl.edu.icm.coansys.webdemo.data.json;
 
+import org.apache.solr.client.solrj.beans.Field;
+import pl.edu.icm.coansys.citations.data.MatchableEntity;
+
 /**
  *
  * @author matfed
@@ -34,7 +37,8 @@ public class DocumentMetadata {
     public String getId() {
         return id;
     }
-
+    
+    @Field
     public void setId(String id) {
         this.id = id;
     }
@@ -43,6 +47,7 @@ public class DocumentMetadata {
         return doi;
     }
 
+    @Field
     public void setDoi(String doi) {
         this.doi = doi;
     }
@@ -51,6 +56,7 @@ public class DocumentMetadata {
         return author;
     }
 
+    @Field
     public void setAuthor(String author) {
         this.author = author;
     }
@@ -59,6 +65,7 @@ public class DocumentMetadata {
         return year;
     }
 
+    @Field
     public void setYear(String year) {
         this.year = year;
     }
@@ -67,6 +74,7 @@ public class DocumentMetadata {
         return title;
     }
 
+    @Field
     public void setTitle(String title) {
         this.title = title;
     }
@@ -75,6 +83,7 @@ public class DocumentMetadata {
         return journal;
     }
 
+    @Field("source")
     public void setJournal(String journal) {
         this.journal = journal;
     }
@@ -83,8 +92,12 @@ public class DocumentMetadata {
         return pages;
     }
 
+    @Field
     public void setPages(String pages) {
         this.pages = pages;
     }
     
+    public MatchableEntity toMatchableEntity() {
+        return MatchableEntity.fromParameters(id, author, journal, title, pages, year, null);
+    }
 }

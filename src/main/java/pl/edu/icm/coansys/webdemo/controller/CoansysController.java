@@ -23,7 +23,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import pl.edu.icm.coansys.citations.data.MatchableEntity;
 import pl.edu.icm.coansys.webdemo.data.json.Citation;
 import pl.edu.icm.coansys.webdemo.data.json.DocumentMetadata;
@@ -32,7 +31,7 @@ import pl.edu.icm.coansys.webdemo.data.json.MatchedDocument;
 import pl.edu.icm.coansys.webdemo.data.json.MatchingRequest;
 import pl.edu.icm.coansys.webdemo.data.json.MatchingResult;
 import pl.edu.icm.coansys.webdemo.data.json.ResultEntry;
-import pl.edu.icm.coansys.webdemo.service.ParsingService;
+import pl.edu.icm.coansys.webdemo.service.CitationMatchingService;
 
 /**
  *
@@ -43,10 +42,10 @@ public class CoansysController {
     Logger logger = LoggerFactory.getLogger(CoansysController.class);
     
     @Autowired
-    private ParsingService parsingService;
+    private CitationMatchingService citationMatchingService;
 
-    public void setParsingService(ParsingService parsingService) {
-        this.parsingService = parsingService;
+    public void setCitationMatchingService(CitationMatchingService citationMatchingService) {
+        this.citationMatchingService = citationMatchingService;
     }
     
     @RequestMapping(value = "/citation_matching.do", method = RequestMethod.POST)
@@ -61,21 +60,15 @@ public class CoansysController {
             for (Citation cit : req.getCitations()) {
                 String citationText = cit.getCitationText();
                 logger.info(citationText);
-                MatchableEntity parsed = parsingService.parseCitation(citationText);
-                List<MatchedDocument> matched = new ArrayList<MatchedDocument>();
-                matched.add(new MatchedDocument(0.95, new DocumentMetadata("doc1", "10.1000/182", "Nicolaus Copernicus", "1543", "De revolutionibus orbium coelestium", null, null)));
-                matched.add(new MatchedDocument(0.6, new DocumentMetadata("doc123", null, null, null, null, null, null)));
                 
-                results.add(new ResultEntry(
-                        citationText, 
-                        new ExtractedMetadata(parsed.author(), parsed.year(), parsed.title(), parsed.source(), parsed.pages()), 
-                        matched));
+                results.add(citationMatchingService.matchCitation(citationText));
             }
             
             String response = new Gson().toJson(new MatchingResult(results));
             
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+            responseHeaders.add("Access-Control-Allow-Origin", "*");
 
             return new ResponseEntity<String>(response, responseHeaders, HttpStatus.OK);
         } catch (Exception ex) {
@@ -90,7 +83,7 @@ public class CoansysController {
             
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-
+            responseHeaders.add("Access-Control-Allow-Origin", "*");
             String response = "{\r\n" +
 "    \"outputObject\": {\r\n" +
 "        \"givenArticleDetails\": {\r\n" +
