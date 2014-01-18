@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "required": true,
+  "properties": {
+    "inputObject": {
+      "type": "object",
+      "required": true,
+      "properties": {
+        "doi": {
+          "type": "string",
+          "required": true
+        }
+      }
+    }
+  }
+}
