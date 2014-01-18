@@ -22,12 +22,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import pl.edu.icm.coansys.commons.java.StackTraceExtractor;
+import pl.edu.icm.coansys.webdemo.data.json.Citation;
+import pl.edu.icm.coansys.webdemo.data.json.MatchingRequest;
+import pl.edu.icm.coansys.webdemo.data.json.MatchingResult;
+import pl.edu.icm.coansys.webdemo.data.json.ResultEntry;
+import pl.edu.icm.coansys.webdemo.docsim.auxiliary.AuxiliaryDTO;
+import pl.edu.icm.coansys.webdemo.docsim.auxiliary.DTOCreator;
+import pl.edu.icm.coansys.webdemo.docsim.auxiliary.DocSimInfoCollector;
+import pl.edu.icm.coansys.webdemo.docsim.auxiliary.Input;
+import pl.edu.icm.coansys.webdemo.docsim.auxiliary.Output;
 import pl.edu.icm.coansys.webdemo.service.CitationMatchingService;
-import pl.edu.icm.coansys.webdemo.docsim.dto.json.AuxiliaryDTO;
-import pl.edu.icm.coansys.webdemo.docsim.dto.json.Input;
-import pl.edu.icm.coansys.webdemo.docsim.dto.json.Output;
-import pl.edu.icm.coansys.webdemo.service.ParsingService;
 
 import com.google.gson.Gson;
 
@@ -90,7 +96,8 @@ public class CoansysController {
 		AuxiliaryDTO auxDto = dtoCreator.getAuxiliaryDTO(doi, coll);
 		Output o = auxDto.toOutput();
 		String response = new Gson().toJson(o, Output.class);
-		logger.debug("the response: " + response);
+		
+		System.out.println("the response: " + response);
 
 		/* shutdown connection with db */
 		coll.tearDown();
