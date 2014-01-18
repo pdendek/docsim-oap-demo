@@ -7,6 +7,7 @@
 package pl.edu.icm.coansys.webdemo.service;
 
 import org.springframework.stereotype.Component;
+
 import pl.edu.icm.cermine.bibref.BibReferenceParser;
 import pl.edu.icm.cermine.bibref.CRFBibReferenceParser;
 import pl.edu.icm.cermine.exception.AnalysisException;

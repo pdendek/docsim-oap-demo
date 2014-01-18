@@ -6,9 +6,9 @@
 
 package pl.edu.icm.coansys.webdemo.data.json;
 
-import pl.edu.icm.coansys.webdemo.data.json.MatchingRequest;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

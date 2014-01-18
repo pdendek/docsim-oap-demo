@@ -7,12 +7,16 @@ package pl.edu.icm.coansys.webdemo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+
+
 import org.springframework.stereotype.Component;
+
 import pl.edu.icm.cermine.bibref.CRFBibReferenceParser;
 import pl.edu.icm.cermine.exception.AnalysisException;
 import pl.edu.icm.coansys.citations.data.MatchableEntity;
