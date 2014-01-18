@@ -1,4 +1,4 @@
-package pl.edu.icm.coansys.webdemo.docsim.auxiliary;
+package pl.edu.icm.coansys.webdemo.docsim.constants;
 
 
 public class DocumentSimilarityConstants {

@@ -1,16 +1,17 @@
-package pl.edu.icm.coansys.webdemo.docsim.auxiliary;
+package pl.edu.icm.coansys.webdemo.docsim.dto;
 
-import pl.edu.icm.coansys.webdemo.docsim.auxiliary.Output.MainPaper;
-import pl.edu.icm.coansys.webdemo.docsim.auxiliary.Output.OtherPaper;
-import pl.edu.icm.coansys.webdemo.docsim.auxiliary.Output.OutputObject;
+import pl.edu.icm.coansys.webdemo.docsim.json.Output;
+import pl.edu.icm.coansys.webdemo.docsim.json.Output.MainPaper;
+import pl.edu.icm.coansys.webdemo.docsim.json.Output.OtherPaper;
+import pl.edu.icm.coansys.webdemo.docsim.json.Output.OutputObject;
 
-public class AuxiliaryDTO {
+public class AuxiliaryDto {
 		public float sim = -1;
 		public String doi;
 		public String year;
 		public String title;
 		public String[] authors;
-		public AuxiliaryDTO[] sims;
+		public AuxiliaryDto[] sims;
 		
 		public OtherPaper toOtherPaper(){
 			OtherPaper op = new OtherPaper();
@@ -31,7 +32,7 @@ public class AuxiliaryDTO {
 			
 			OtherPaper[] op = new OtherPaper[sims.length];
 			int idx = 0;
-			for(AuxiliaryDTO adto : sims){
+			for(AuxiliaryDto adto : sims){
 				op[idx] = adto.toOtherPaper();
 				idx++;
 			}

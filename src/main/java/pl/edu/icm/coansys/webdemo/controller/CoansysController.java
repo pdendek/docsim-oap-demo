@@ -28,12 +28,12 @@ import pl.edu.icm.coansys.webdemo.data.json.Citation;
 import pl.edu.icm.coansys.webdemo.data.json.MatchingRequest;
 import pl.edu.icm.coansys.webdemo.data.json.MatchingResult;
 import pl.edu.icm.coansys.webdemo.data.json.ResultEntry;
-import pl.edu.icm.coansys.webdemo.docsim.auxiliary.AuxiliaryDTO;
-import pl.edu.icm.coansys.webdemo.docsim.auxiliary.DTOCreator;
-import pl.edu.icm.coansys.webdemo.docsim.auxiliary.DocSimInfoCollector;
-import pl.edu.icm.coansys.webdemo.docsim.auxiliary.Input;
-import pl.edu.icm.coansys.webdemo.docsim.auxiliary.Output;
+import pl.edu.icm.coansys.webdemo.docsim.dto.AuxiliaryDto;
+import pl.edu.icm.coansys.webdemo.docsim.dto.DtoCreator;
+import pl.edu.icm.coansys.webdemo.docsim.json.Input;
+import pl.edu.icm.coansys.webdemo.docsim.json.Output;
 import pl.edu.icm.coansys.webdemo.service.CitationMatchingService;
+import pl.edu.icm.coansys.webdemo.service.DocumentSimarityService;
 
 import com.google.gson.Gson;
 
@@ -48,6 +48,9 @@ public class CoansysController {
     
     @Autowired
     private CitationMatchingService citationMatchingService;
+    @Autowired
+    private DocumentSimarityService documentSimarityService;
+    
 
     public void setCitationMatchingService(CitationMatchingService citationMatchingService) {
         this.citationMatchingService = citationMatchingService;
@@ -89,11 +92,11 @@ public class CoansysController {
 		String doi = injson.getInputObject().getDoi();
 		
 		/* initialize connection with db */
-		DocSimInfoCollector coll = new DocSimInfoCollector().init();
+		DocumentSimarityService coll = new DocumentSimarityService().init();
 
 		/* communicate with db and construct the result */
-		DTOCreator dtoCreator = new DTOCreator();
-		AuxiliaryDTO auxDto = dtoCreator.getAuxiliaryDTO(doi, coll);
+		DtoCreator dtoCreator = new DtoCreator();
+		AuxiliaryDto auxDto = dtoCreator.getAuxiliaryDTO(doi, coll);
 		Output o = auxDto.toOutput();
 		String response = new Gson().toJson(o, Output.class);
 		
@@ -117,20 +120,16 @@ public class CoansysController {
 		Input input = new Gson().fromJson(query, Input.class);
 		String doi = input.getInputObject().getDoi();
 
-		DocSimInfoCollector coll;
 		try {
-			/* initialize connection with db */
-			coll = new DocSimInfoCollector().init();
-			
 			/* communicate with db and construct the result */
-			DTOCreator dtoCreator = new DTOCreator();
-			AuxiliaryDTO auxDto = dtoCreator.getAuxiliaryDTO(doi, coll);
-			Output o = auxDto.toOutput();
+			DtoCreator dtoCreator = new DtoCreator();
+			AuxiliaryDto auxiliaryDto = dtoCreator.getAuxiliaryDTO(doi, documentSimarityService);
+			Output o = auxiliaryDto.toOutput();
 			response = new Gson().toJson(o, Output.class);
 			logger.debug("the response: " + response);
 
 			/* shutdown connection with db */
-			coll.tearDown();
+			documentSimarityService.tearDown();
 		} catch (SQLException e) {
 			String error = StackTraceExtractor.getStackTrace(e);
 			logger.error(error);

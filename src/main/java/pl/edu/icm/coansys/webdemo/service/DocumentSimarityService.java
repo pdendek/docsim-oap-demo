@@ -1,4 +1,4 @@
-package pl.edu.icm.coansys.webdemo.docsim.auxiliary;
+package pl.edu.icm.coansys.webdemo.service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,8 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pl.edu.icm.coansys.commons.java.StackTraceExtractor;
+import pl.edu.icm.coansys.webdemo.docsim.constants.DocumentSimilarityConstants;
 
-public class DocSimInfoCollector {
+public class DocumentSimarityService {
 
 	/**
 	 * 
@@ -45,7 +46,7 @@ public class DocSimInfoCollector {
 		};
 	}
 	
-	static Logger logger = LoggerFactory.getLogger(DocSimInfoCollector.class);
+	static Logger logger = LoggerFactory.getLogger(DocumentSimarityService.class);
 	
 	String dbhost = null;
 
@@ -95,11 +96,11 @@ public class DocSimInfoCollector {
 
 	Connection con = null;
 
-	public DocSimInfoCollector() {
+	public DocumentSimarityService() {
 
 	}
 
-	public DocSimInfoCollector init() throws SQLException {
+	public DocumentSimarityService init() throws SQLException {
 		this.dbhost = "localhost";
 		this.dbname = "docsimtestdb";
 		this.dbuser = "postgres";
