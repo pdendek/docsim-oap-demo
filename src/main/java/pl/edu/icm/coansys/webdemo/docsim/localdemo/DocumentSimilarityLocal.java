@@ -26,7 +26,6 @@ import com.google.gson.Gson;
 public class DocumentSimilarityLocal {
 
 	Logger logger = LoggerFactory.getLogger(DocumentSimilarityLocal.class);
-	private DocumentSimarityService documentSimarityService;
 
 	public static void main(String[] args) throws SQLException {
 		/* input parsing */
