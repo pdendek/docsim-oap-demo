@@ -123,7 +123,7 @@ public class DocumentSimarityService {
 	}
 
 	@PostConstruct
-	public DocumentSimarityService init() throws SQLException {
+	public DocumentSimarityService init() throws SQLException, ClassNotFoundException {
 		getConnection();
 		return this;
 	}
@@ -140,8 +140,9 @@ public class DocumentSimarityService {
 		}
 	}
 	
-	synchronized public void getConnection() throws SQLException {
+	synchronized public void getConnection() throws SQLException, ClassNotFoundException {
 		if (con == null) {
+                        Class.forName("org.postgresql.Driver");
 			String url = "jdbc:postgresql://" + dbhost + "/" + dbname;
 			con = DriverManager.getConnection(url, dbuser, dbpasswd);
 		}
