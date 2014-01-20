@@ -16,17 +16,15 @@
 	<context:property-placeholder location="classpath:application.properties" />
 
 	<bean id="solrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">
-		<constructor-arg>
-			<value>${solr.server.url}</value>
-		</constructor-arg>
+		<constructor-arg value="${solr.server.url}" />
 	</bean>
 
 	<bean id="documentSimarityService"
 		class="pl.edu.icm.coansys.webdemo.service.DocumentSimarityService">
-		<constructor-arg value="${docsim.postgres.dbhost} />
-		<constructor-arg value="${docsim.postgres.dbname} />
-		<constructor-arg value="${docsim.postgres.dbuser} />
-		<constructor-arg value="${docsim.postgres.dbpasswd} />
+		<constructor-arg value="${docsim.postgres.dbhost}" />
+		<constructor-arg value="${docsim.postgres.dbname}" />
+		<constructor-arg value="${docsim.postgres.dbuser}" />
+		<constructor-arg value="${docsim.postgres.dbpasswd}" />
 	</bean>
 
 </beans>
