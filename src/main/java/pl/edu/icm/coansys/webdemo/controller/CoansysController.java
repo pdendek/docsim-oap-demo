@@ -6,7 +6,6 @@
 
 package pl.edu.icm.coansys.webdemo.controller;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -87,30 +86,6 @@ public class CoansysController {
 			return new ResponseEntity<String>("Exception: " + ex.getMessage(),
 					null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}
-
-	public static void main(String[] args) throws SQLException {
-		/* input parsing */
-		String in = "{ \"inputObject\" : { \"doi\": \"10.1208/s12248-007-9000-9\" }}";
-		Input injson = new Gson().fromJson(in, Input.class);
-		String doi = injson.getInputObject().getDoi();
-
-		/* initialize connection with db */
-		DocumentSimarityService coll = new DocumentSimarityService().init();
-
-		/* communicate with db and construct the result */
-		DtoCreator dtoCreator = new DtoCreator();
-		AuxiliaryDto auxDto = dtoCreator.getAuxiliaryDTO(doi, coll);
-		Output o = auxDto.toOutput();
-		String response = new Gson().toJson(o, Output.class);
-
-		System.out.println("the response: " + response);
-
-		/* shutdown connection with db */
-		coll.tearDown();
-
-		/* return results */
-		System.out.println(response);
 	}
 
 	@RequestMapping(value = "/document_similarity.do", method = RequestMethod.POST)
