@@ -49,7 +49,12 @@ public class DocumentSimarityService {
 	static Logger logger = LoggerFactory.getLogger(DocumentSimarityService.class);
 	
 	String dbhost = null;
+	String dbname = null;
+	String dbuser = null;
+	String dbpasswd = null;
 
+	Connection con = null;
+	
 	public String getDbhost() {
 		return dbhost;
 	}
@@ -89,12 +94,6 @@ public class DocumentSimarityService {
 	public void setCon(Connection con) {
 		this.con = con;
 	}
-
-	String dbname = null;
-	String dbuser = null;
-	String dbpasswd = null;
-
-	Connection con = null;
 
 	public DocumentSimarityService() {
 
