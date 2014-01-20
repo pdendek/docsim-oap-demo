@@ -10,10 +10,12 @@ import java.util.Comparator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import pl.edu.icm.coansys.commons.java.StackTraceExtractor;
 import pl.edu.icm.coansys.webdemo.docsim.constants.DocumentSimilarityConstants;
 
+@Component
 public class DocumentSimarityService {
 
 	/**
