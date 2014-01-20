@@ -1,0 +1,72 @@
+{
+  "type": "object",
+  "required": true,
+  "properties": {
+    "outputObject": {
+      "type": "object",
+      "required": true,
+      "properties": {
+        "givenArticleDetails": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "doi": {
+              "type": "string",
+              "required": true
+            },
+            "year": {
+              "type": "string",
+              "required": true
+            },
+            "title": {
+              "type": "string",
+              "required": true
+            },          
+            "authors": {
+              "type": "array",
+              "required": true,
+              "items": {
+                "type": "string",
+                "required": true
+              }
+            }
+          }
+        },
+        "similarDocuments": {
+          "type": "array",
+          "required": true,
+          "document": {
+            "type": "object",
+            "required": true,
+            "properties": {
+              "similarity": {
+                "type": "float",
+                "required": true
+              },
+              "doi": {
+                "type": "string",
+                "required": true
+              },
+              "year": {
+                "type": "string",
+                "required": true
+              }
+              "title": {
+                "type": "string",
+                "required": true
+              },              
+              "authors": {
+                "type": "array",
+                "required": true,
+                "author": {
+                  "type": "string",
+	              "required": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
