@@ -145,6 +145,7 @@ public class CoansysController {
 		/* respond with the constructed result */
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+                responseHeaders.add("Access-Control-Allow-Origin", "*");
 		return new ResponseEntity<String>(response, responseHeaders,
 				HttpStatus.OK);
 	}
