@@ -36,117 +36,119 @@ import pl.edu.icm.coansys.webdemo.service.CitationMatchingService;
 import pl.edu.icm.coansys.webdemo.service.DocumentSimarityService;
 
 import com.google.gson.Gson;
+import java.nio.charset.Charset;
 
 /**
- * 
+ *
  * @author matfed, pdendek
  */
 @org.springframework.stereotype.Controller
 public class CoansysController {
 
-	Logger logger = LoggerFactory.getLogger(CoansysController.class);
+    public static MediaType APPLICATION_JSON_UTF8
+            = new MediaType("application", "json", Charset.forName("utf-8"));
 
-	@Autowired
-	private CitationMatchingService citationMatchingService;
-	@Autowired
-	private DocumentSimarityService documentSimarityService;
+    Logger logger = LoggerFactory.getLogger(CoansysController.class);
 
-	public void setCitationMatchingService(
-			CitationMatchingService citationMatchingService) {
-		this.citationMatchingService = citationMatchingService;
-	}
+    @Autowired
+    private CitationMatchingService citationMatchingService;
+    @Autowired
+    private DocumentSimarityService documentSimarityService;
 
-	@RequestMapping(value = "/citation_matching.do", method = RequestMethod.POST)
-	public ResponseEntity<String> citationMatching(@RequestBody String query,
-			Model model) {
-		try {
-			logger.debug("the query: " + query);
-			MatchingRequest req = MatchingRequest.fromJson(query);
+    public void setCitationMatchingService(
+            CitationMatchingService citationMatchingService) {
+        this.citationMatchingService = citationMatchingService;
+    }
 
-			List<ResultEntry> results = new ArrayList<ResultEntry>();
+    @RequestMapping(value = "/citation_matching.do", method = RequestMethod.POST)
+    public ResponseEntity<String> citationMatching(@RequestBody String query,
+            Model model) {
+        HttpHeaders responseHeaders = null;
+        try {
+            logger.debug("the query: " + query);
 
-			for (Citation cit : req.getCitations()) {
-				String citationText = cit.getCitationText();
-				logger.info(citationText);
+            responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(APPLICATION_JSON_UTF8);
+            responseHeaders.add("Access-Control-Allow-Origin", "*");
 
-				results.add(citationMatchingService.matchCitation(citationText));
-			}
+            MatchingRequest req = MatchingRequest.fromJson(query);
 
-			String response = new Gson().toJson(new MatchingResult(results));
+            List<ResultEntry> results = new ArrayList<ResultEntry>();
 
-			HttpHeaders responseHeaders = new HttpHeaders();
-			responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-			responseHeaders.add("Access-Control-Allow-Origin", "*");
+            for (Citation cit : req.getCitations()) {
+                String citationText = cit.getCitationText();
+                logger.info(citationText);
 
-			return new ResponseEntity<String>(response, responseHeaders,
-					HttpStatus.OK);
-		} catch (Exception ex) {
-			java.util.logging.Logger.getLogger(
-					CoansysController.class.getName()).log(Level.SEVERE, null,
-					ex);
-			return new ResponseEntity<String>("Exception: " + ex.getMessage(),
-					null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
+                results.add(citationMatchingService.matchCitation(citationText));
+            }
 
-	public static void main(String[] args) throws SQLException {
-		/* input parsing */
-		String in = "{ \"inputObject\" : { \"doi\": \"10.1208/s12248-007-9000-9\" }}";
-		Input injson = new Gson().fromJson(in, Input.class);
-		String doi = injson.getInputObject().getDoi();
+            String response = new Gson().toJson(new MatchingResult(results));
 
-		/* initialize connection with db */
-		DocumentSimarityService coll = new DocumentSimarityService().init();
+            return new ResponseEntity<String>(response, responseHeaders, HttpStatus.OK);
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(CoansysController.class.getName()).log(Level.SEVERE, null, ex);
+            String response = "{\"error\":\"" + ex.getMessage().replace("\\", "\\\\").replace("\"", "\\\"") + "\"}";
+            return new ResponseEntity<String>(response, responseHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-		/* communicate with db and construct the result */
-		DtoCreator dtoCreator = new DtoCreator();
-		AuxiliaryDto auxDto = dtoCreator.getAuxiliaryDTO(doi, coll);
-		Output o = auxDto.toOutput();
-		String response = new Gson().toJson(o, Output.class);
+    public static void main(String[] args) throws SQLException {
+        /* input parsing */
+        String in = "{ \"inputObject\" : { \"doi\": \"10.1208/s12248-007-9000-9\" }}";
+        Input injson = new Gson().fromJson(in, Input.class);
+        String doi = injson.getInputObject().getDoi();
 
-		System.out.println("the response: " + response);
+        /* initialize connection with db */
+        DocumentSimarityService coll = new DocumentSimarityService().init();
 
-		/* shutdown connection with db */
-		coll.tearDown();
+        /* communicate with db and construct the result */
+        DtoCreator dtoCreator = new DtoCreator();
+        AuxiliaryDto auxDto = dtoCreator.getAuxiliaryDTO(doi, coll);
+        Output o = auxDto.toOutput();
+        String response = new Gson().toJson(o, Output.class);
 
-		/* return results */
-		System.out.println(response);
-	}
+        System.out.println("the response: " + response);
 
-	@RequestMapping(value = "/document_similarity.do", method = RequestMethod.POST)
-	public ResponseEntity<String> documentSimilarity(@RequestBody String query,
-			Model model) {
+        /* shutdown connection with db */
+        coll.tearDown();
 
-		logger.debug("the query: " + query);
-		
-		
-		String response = null;
-		try {
-			/* input parsing */
-			Input input = new Gson().fromJson(query, Input.class);
-			String doi = input.getInputObject().getDoi();
+        /* return results */
+        System.out.println(response);
+    }
 
-			/* communicate with db and construct the result */
-			DtoCreator dtoCreator = new DtoCreator();
-			AuxiliaryDto auxiliaryDto = dtoCreator.getAuxiliaryDTO(doi,
-					documentSimarityService);
-			Output o = auxiliaryDto.toOutput();
-			response = new Gson().toJson(o, Output.class);
-			logger.debug("the response: " + response);
+    @RequestMapping(value = "/document_similarity.do", method = RequestMethod.POST)
+    public ResponseEntity<String> documentSimilarity(@RequestBody String query,
+            Model model) {
 
-			/* shutdown connection with db */
-			documentSimarityService.tearDown();
-		} catch (Exception e) {
-			String error = StackTraceExtractor.getStackTrace(e);
-			logger.error(error);
-			response = "{ \"error\" : \"" + e.getMessage() + "\"}";
-		}
+        logger.debug("the query: " + query);
 
-		/* respond with the constructed result */
-		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-                responseHeaders.add("Access-Control-Allow-Origin", "*");
-		return new ResponseEntity<String>(response, responseHeaders,
-				HttpStatus.OK);
-	}
+        String response = null;
+        try {
+            /* input parsing */
+            Input input = new Gson().fromJson(query, Input.class);
+            String doi = input.getInputObject().getDoi();
+
+            /* communicate with db and construct the result */
+            DtoCreator dtoCreator = new DtoCreator();
+            AuxiliaryDto auxiliaryDto = dtoCreator.getAuxiliaryDTO(doi,
+                    documentSimarityService);
+            Output o = auxiliaryDto.toOutput();
+            response = new Gson().toJson(o, Output.class);
+            logger.debug("the response: " + response);
+
+            /* shutdown connection with db */
+            documentSimarityService.tearDown();
+        } catch (Exception e) {
+            String error = StackTraceExtractor.getStackTrace(e);
+            logger.error(error);
+            response = "{ \"error\" : \"" + e.getMessage() + "\"}";
+        }
+
+        /* respond with the constructed result */
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentType(APPLICATION_JSON_UTF8);
+        responseHeaders.add("Access-Control-Allow-Origin", "*");
+        return new ResponseEntity<String>(response, responseHeaders,
+                HttpStatus.OK);
+    }
 }
