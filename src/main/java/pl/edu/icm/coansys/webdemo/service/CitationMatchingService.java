@@ -6,6 +6,7 @@
 package pl.edu.icm.coansys.webdemo.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,7 +58,7 @@ public class CitationMatchingService {
         for (DocumentMetadata doc : candidates) {
             MatchableEntity entity = doc.toMatchableEntity();
             double score = measurer.similarity(parsed, entity);
-            if (score > 0.0) {
+            if (score >= 0.5) {
                 matched.add(new MatchedDocument(score, doc));
             }
         }
@@ -80,7 +81,9 @@ public class CitationMatchingService {
         String yearStr = StringUtils.join(years, " ");
         
         String authorStr = StringUtils.join(JavaConverters.asJavaSetConverter(lettersNormaliseTokenise(text).toSet()).asJava(), " ");
-                
+        if (StringUtils.isBlank(yearStr) || StringUtils.isBlank(authorStr)) {
+            return Collections.<DocumentMetadata>emptyList();
+        }
         String queryStr = "author_idxd:(" + authorStr + ") AND year_idxd:(" + yearStr + ")";
         SolrQuery query = new SolrQuery(queryStr);        
         QueryResponse rsp = solrServer.query(query);

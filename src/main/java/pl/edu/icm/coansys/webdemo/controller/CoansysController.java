@@ -35,59 +35,62 @@ import pl.edu.icm.coansys.webdemo.service.CitationMatchingService;
 import pl.edu.icm.coansys.webdemo.service.DocumentSimarityService;
 
 import com.google.gson.Gson;
+import java.nio.charset.Charset;
 
 /**
- * 
+ *
  * @author matfed, pdendek
  */
 @org.springframework.stereotype.Controller
 public class CoansysController {
 
-	Logger logger = LoggerFactory.getLogger(CoansysController.class);
+    public static MediaType APPLICATION_JSON_UTF8
+            = new MediaType("application", "json", Charset.forName("utf-8"));
 
-	@Autowired
-	private CitationMatchingService citationMatchingService;
-	@Autowired
-	private DocumentSimarityService documentSimarityService;
+    Logger logger = LoggerFactory.getLogger(CoansysController.class);
 
-	public void setCitationMatchingService(
-			CitationMatchingService citationMatchingService) {
-		this.citationMatchingService = citationMatchingService;
-	}
+    @Autowired
+    private CitationMatchingService citationMatchingService;
+    @Autowired
+    private DocumentSimarityService documentSimarityService;
 
-	@RequestMapping(value = "/citation_matching.do", method = RequestMethod.POST)
-	public ResponseEntity<String> citationMatching(@RequestBody String query,
-			Model model) {
-		try {
-			logger.debug("the query: " + query);
-			MatchingRequest req = MatchingRequest.fromJson(query);
+    public void setCitationMatchingService(
+            CitationMatchingService citationMatchingService) {
+        this.citationMatchingService = citationMatchingService;
+    }
 
-			List<ResultEntry> results = new ArrayList<ResultEntry>();
+    @RequestMapping(value = "/citation_matching.do", method = RequestMethod.POST)
+    public ResponseEntity<String> citationMatching(@RequestBody String query,
+            Model model) {
+        HttpHeaders responseHeaders = null;
+        try {
+            logger.debug("the query: " + query);
 
-			for (Citation cit : req.getCitations()) {
-				String citationText = cit.getCitationText();
-				logger.info(citationText);
+            responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(APPLICATION_JSON_UTF8);
+            responseHeaders.add("Access-Control-Allow-Origin", "*");
 
-				results.add(citationMatchingService.matchCitation(citationText));
-			}
+            MatchingRequest req = MatchingRequest.fromJson(query);
 
-			String response = new Gson().toJson(new MatchingResult(results));
+            List<ResultEntry> results = new ArrayList<ResultEntry>();
 
-			HttpHeaders responseHeaders = new HttpHeaders();
-			responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-			responseHeaders.add("Access-Control-Allow-Origin", "*");
+            for (Citation cit : req.getCitations()) {
+                String citationText = cit.getCitationText();
+                logger.info(citationText);
 
-			return new ResponseEntity<String>(response, responseHeaders,
-					HttpStatus.OK);
-		} catch (Exception ex) {
-			java.util.logging.Logger.getLogger(
-					CoansysController.class.getName()).log(Level.SEVERE, null,
-					ex);
-			return new ResponseEntity<String>("Exception: " + ex.getMessage(),
-					null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
+                results.add(citationMatchingService.matchCitation(citationText));
+            }
 
+            String response = new Gson().toJson(new MatchingResult(results));
+
+            return new ResponseEntity<String>(response, responseHeaders, HttpStatus.OK);
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(CoansysController.class.getName()).log(Level.SEVERE, null, ex);
+            String response = "{\"error\":\"" + ex.getMessage().replace("\\", "\\\\").replace("\"", "\\\"") + "\"}";
+            return new ResponseEntity<String>(response, responseHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
     @RequestMapping(value = "/document_similarity.do", method = RequestMethod.POST)
     public ResponseEntity<String> documentSimilarity(@RequestBody String query,
             Model model) {
