@@ -111,8 +111,6 @@ public class CoansysController {
             response = new Gson().toJson(o, Output.class);
             logger.debug("the response: " + response);
 
-            /* shutdown connection with db */
-            documentSimarityService.tearDown();
         } catch (Exception e) {
             String error = StackTraceExtractor.getStackTrace(e);
             logger.error(error);
