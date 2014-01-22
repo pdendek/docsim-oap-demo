@@ -88,40 +88,15 @@ public class CoansysController {
 		}
 	}
 
-	@RequestMapping(value = "/document_similarity.do", method = RequestMethod.POST)
-	public ResponseEntity<String> documentSimilarity(@RequestBody String query,
-			Model model) {
-
-		logger.debug("the query: " + query);
-		
-		
-		String response = null;
-		try {
-			/* input parsing */
-			Input input = new Gson().fromJson(query, Input.class);
-			String doi = input.getInputObject().getDoi();
-
-			/* communicate with db and construct the result */
-			DtoCreator dtoCreator = new DtoCreator();
-			AuxiliaryDto auxiliaryDto = dtoCreator.getAuxiliaryDTO(doi,
-					documentSimarityService);
-			Output o = auxiliaryDto.toOutput();
-			response = new Gson().toJson(o, Output.class);
-			logger.debug("the response: " + response);
-
-			/* shutdown connection with db */
-			documentSimarityService.tearDown();
-		} catch (Exception e) {
-			String error = StackTraceExtractor.getStackTrace(e);
-			logger.error(error);
-			response = "{ \"error\" : \"" + e.getMessage() + "\"}";
-		}
-
-		/* respond with the constructed result */
-		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-                responseHeaders.add("Access-Control-Allow-Origin", "*");
-		return new ResponseEntity<String>(response, responseHeaders,
-				HttpStatus.OK);
-	}
+    @RequestMapping(value = "/document_similarity.do", method = RequestMethod.POST)
+    public ResponseEntity<String> documentSimilarity(@RequestBody String query,
+            Model model) {
+            logger.debug("the query: " + query);
+            
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+            responseHeaders.add("Access-Control-Allow-Origin", "*");
+            String response = "{\"outputObject\":{\"givenArticleDetails\":{\"doi\":\"10.3791/3308\",\"year\":\"2012\",\"title\":\"ImplantationofaCarotidCuffforTriggeringShear-stressInducedAtherosclerosisinMice\",\"authors\":[\"MichaelT.Kuhlmann\",\"SimonCuhlmann\",\"IrmgardHoppe\",\"RobKrams\",\"PaulC.Evans\",\"GustavJ.Strijkers\",\"KlaasNicolay\",\"SvenHermann\",\"MichaelSchäfers\"]},\"similarResults\":[{\"similarity\":\"0.9\",\"doi\":\"10.3791/9\",\"year\":\"2012\",\"title\":\"Implantation\",\"authors\":[\"MichaelT.Kuhlmann\"]},{\"similarity\":\"0.8\",\"doi\":\"10.3791/8\",\"year\":\"2012\",\"title\":\"of\",\"authors\":[\"SimonCuhlmann\"]},{\"similarity\":\"0.7\",\"doi\":\"10.3791/7\",\"year\":\"2012\",\"title\":\"a\",\"authors\":[\"IrmgardHoppe\"]},{\"similarity\":\"0.6\",\"doi\":\"10.3791/6\",\"year\":\"2012\",\"title\":\"CarotidCuff\",\"authors\":[\"RobKrams\"]},{\"similarity\":\"0.5\",\"doi\":\"10.3791/5\",\"year\":\"2012\",\"title\":\"forTriggering\",\"authors\":[\"PaulC.Evans\"]}]}}";
+            return new ResponseEntity<String>(response, responseHeaders, HttpStatus.OK);
+    }
 }
