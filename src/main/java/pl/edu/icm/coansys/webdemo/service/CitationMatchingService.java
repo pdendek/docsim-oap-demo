@@ -51,6 +51,8 @@ public class CitationMatchingService {
     
     @Value("${citations.similarity.threshold}")
     private double similarityThreshold;
+    @Value("${citations.max.matched.documents}")
+    private int maxMatchedDocs;
     private SolrServer solrServer;
 
     @Autowired
@@ -76,7 +78,9 @@ public class CitationMatchingService {
         
         Collections.sort(matched, new MatchedDocumentComparator());
 
-        return new ResultEntry(citationText, ExtractedMetadata.fromMatchableEntity(parsed), matched);
+        return new ResultEntry(citationText, 
+                               ExtractedMetadata.fromMatchableEntity(parsed), 
+                               matched.subList(0, Math.min(maxMatchedDocs, matched.size())));
     }
     
     public List<DocumentMetadata> getHeuristicallyMatching(MatchableEntity entity) throws SolrServerException {
