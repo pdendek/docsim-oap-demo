@@ -27,7 +27,7 @@ public class DocumentSimilarityLocal {
 
 	Logger logger = LoggerFactory.getLogger(DocumentSimilarityLocal.class);
 
-	public static void main(String[] args) throws SQLException {
+	public static void main(String[] args) throws SQLException, ClassNotFoundException {
 		/* input parsing */
 		String in = "{ \"inputObject\" : { \"doi\": \"10.1208/s12248-007-9000-9\" }}";
 		Input injson = new Gson().fromJson(in, Input.class);
