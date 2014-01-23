@@ -7,6 +7,7 @@ package pl.edu.icm.coansys.webdemo.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 
 import org.springframework.stereotype.Component;
@@ -40,6 +42,15 @@ import static pl.edu.icm.coansys.citations.util.misc.lettersNormaliseTokenise;
  */
 @Component
 public class CitationMatchingService {
+    private static class MatchedDocumentComparator implements Comparator<MatchedDocument> {
+        @Override
+        public int compare(MatchedDocument o1, MatchedDocument o2) {
+            return -Double.compare(o1.getScore(), o2.getScore());
+        }
+    }
+    
+    @Value("${citations.similarity.threshold}")
+    private double similarityThreshold;
     private SolrServer solrServer;
 
     @Autowired
@@ -58,10 +69,12 @@ public class CitationMatchingService {
         for (DocumentMetadata doc : candidates) {
             MatchableEntity entity = doc.toMatchableEntity();
             double score = measurer.similarity(parsed, entity);
-            if (score >= 0.5) {
+            if (score >= similarityThreshold) {
                 matched.add(new MatchedDocument(score, doc));
             }
         }
+        
+        Collections.sort(matched, new MatchedDocumentComparator());
 
         return new ResultEntry(citationText, ExtractedMetadata.fromMatchableEntity(parsed), matched);
     }

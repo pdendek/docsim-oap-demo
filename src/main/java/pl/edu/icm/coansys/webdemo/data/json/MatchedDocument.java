@@ -20,4 +20,12 @@ public class MatchedDocument {
         this.score = score;
         this.metadata = metadata;
     }
+    
+    public DocumentMetadata getMetadata() {
+        return metadata;
+    }
+
+    public double getScore() {
+        return score;
+    }
 }
